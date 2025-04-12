@@ -3,11 +3,10 @@ using UnityEngine;
 
 public class PlayerCombat : MonoBehaviour
 {
-    [Header("Arma")]
-    public GameObject weaponHitbox;              // Referencia al objeto hijo con el BoxCollider
-    public float attackDuration = 0.3f;          // Cuánto tiempo permanece activa la hitbox
-    
-    [Header("Animación")]
+    [Header("Arma equipada")]
+    public Weapon currentWeapon;           // Arma actual equipada (con su propio hitbox)
+    public float attackDuration = 0.3f;    // Tiempo durante el cual el hitbox estará activo
+
     private Animator animator;
     private bool isAttacking = false;
 
@@ -15,13 +14,10 @@ public class PlayerCombat : MonoBehaviour
     {
         animator = GetComponent<Animator>();
 
-        if (weaponHitbox != null)
+        // Desactiva la hitbox del arma al iniciar
+        if (currentWeapon != null)
         {
-            weaponHitbox.SetActive(false); // Asegura que la hitbox esté inactiva al iniciar
-        }
-        else
-        {
-            Debug.LogWarning("No se asignó el WeaponHitbox en el PlayerCombat.");
+            currentWeapon.Deactivate();
         }
     }
 
@@ -37,18 +33,18 @@ public class PlayerCombat : MonoBehaviour
     {
         isAttacking = true;
 
-        // Activar animación
+        // Lanza la animación de ataque
         animator.SetTrigger("Attack");
 
-        // Activar el arma (hitbox)
-        if (weaponHitbox != null)
-            weaponHitbox.SetActive(true);
+        // Activa el hitbox del arma
+        if (currentWeapon != null)
+            currentWeapon.Activate();
 
         yield return new WaitForSeconds(attackDuration);
 
-        // Desactivar la hitbox después del tiempo
-        if (weaponHitbox != null)
-            weaponHitbox.SetActive(false);
+        // Desactiva la hitbox después de atacar
+        if (currentWeapon != null)
+            currentWeapon.Deactivate();
 
         isAttacking = false;
     }
